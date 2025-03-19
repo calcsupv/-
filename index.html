@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイムチャット</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+        #messages li {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        #messageInput {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+        }
+        #sendButton {
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>リアルタイムチャット</h1>
+    
+    <!-- メッセージの表示エリア -->
+    <ul id="messages"></ul>
+    
+    <!-- メッセージ入力欄 -->
+    <input id="messageInput" type="text" placeholder="メッセージを入力...">
+    <button id="sendButton">送信</button>
+
+    <script>
+        // サーバーに接続する
+        const socket = io();
+
+        // メッセージを送信
+        document.getElementById('sendButton').onclick = () => {
+            const message = document.getElementById('messageInput').value;
+            if (message) {
+                socket.emit('message', message);  // サーバーにメッセージを送信
+                document.getElementById('messageInput').value = '';  // 入力フィールドをクリア
+            }
+        };
+
+        // メッセージを受信して表示
+        socket.on('message', (msg) => {
+            const li = document.createElement('li');
+            li.textContent = msg;
+            document.getElementById('messages').appendChild(li);
+            // スクロールを最下部に
+            const messages = document.getElementById('messages');
+            messages.scrollTop = messages.scrollHeight;
+        });
+    </script>
+</body>
+</html>
