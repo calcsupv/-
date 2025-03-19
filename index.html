@@ -30,10 +30,21 @@
         #sendButton {
             padding: 10px 20px;
         }
+        #status {
+            padding: 10px;
+            font-weight: bold;
+            color: green;
+        }
+        #status.disconnected {
+            color: red;
+        }
     </style>
 </head>
 <body>
     <h1>リアルタイムチャット</h1>
+    
+    <!-- 接続状態の表示エリア -->
+    <div id="status">接続中...</div>
     
     <!-- メッセージの表示エリア -->
     <ul id="messages"></ul>
@@ -45,6 +56,21 @@
     <script>
         // サーバーに接続する
         const socket = io();
+
+        // 初期状態の接続状態の表示
+        document.getElementById('status').textContent = '接続中...';
+
+        // 接続時の状態更新
+        socket.on('connect', () => {
+            document.getElementById('status').textContent = '接続中';
+            document.getElementById('status').classList.remove('disconnected');
+        });
+
+        // 切断時の状態更新
+        socket.on('disconnect', () => {
+            document.getElementById('status').textContent = '接続が切断されました';
+            document.getElementById('status').classList.add('disconnected');
+        });
 
         // メッセージを送信
         document.getElementById('sendButton').onclick = () => {
