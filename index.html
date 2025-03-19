@@ -3,93 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リアルタイムチャット</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        #messages {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            max-height: 400px;
-            overflow-y: scroll;
-        }
-        #messages li {
-            padding: 10px;
-            margin: 5px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-        }
-        #messageInput {
-            width: 80%;
-            padding: 10px;
-            margin: 10px;
-        }
-        #sendButton {
-            padding: 10px 20px;
-        }
-        #status {
-            padding: 10px;
-            font-weight: bold;
-            color: green;
-        }
-        #status.disconnected {
-            color: red;
-        }
-    </style>
+    <title>Socket.IO with Glitch</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script> <!-- Socket.IO クライアント -->
 </head>
 <body>
-    <h1>リアルタイムチャット</h1>
-    
-    <!-- 接続状態の表示エリア -->
-    <div id="status">接続中...</div>
-    
-    <!-- メッセージの表示エリア -->
-    <ul id="messages"></ul>
-    
-    <!-- メッセージ入力欄 -->
-    <input id="messageInput" type="text" placeholder="メッセージを入力...">
-    <button id="sendButton">送信</button>
+    <h1>Socket.IO with Glitch Server</h1>
+    <button id="sendMessageBtn">メッセージを送る</button>
+    <div id="messages"></div>
 
     <script>
-        // サーバーに接続する
-        const socket = io();
+        // GlitchサーバーのURLを指定 (GlitchのURL)
+        const socket = io("https://your-glitch-server-name.glitch.me"); // GlitchサーバーのURL
 
-        // 初期状態の接続状態の表示
-        document.getElementById('status').textContent = '接続中...';
-
-        // 接続時の状態更新
-        socket.on('connect', () => {
-            document.getElementById('status').textContent = '接続中';
-            document.getElementById('status').classList.remove('disconnected');
+        // メッセージ送信ボタンの設定
+        document.getElementById('sendMessageBtn').addEventListener('click', () => {
+            socket.emit('message', 'こんにちは、サーバー！');  // メッセージを送信
         });
 
-        // 切断時の状態更新
-        socket.on('disconnect', () => {
-            document.getElementById('status').textContent = '接続が切断されました';
-            document.getElementById('status').classList.add('disconnected');
-        });
-
-        // メッセージを送信
-        document.getElementById('sendButton').onclick = () => {
-            const message = document.getElementById('messageInput').value;
-            if (message) {
-                socket.emit('message', message);  // サーバーにメッセージを送信
-                document.getElementById('messageInput').value = '';  // 入力フィールドをクリア
-            }
-        };
-
-        // メッセージを受信して表示
+        // サーバーからメッセージを受け取った場合
         socket.on('message', (msg) => {
-            const li = document.createElement('li');
-            li.textContent = msg;
-            document.getElementById('messages').appendChild(li);
-            // スクロールを最下部に
-            const messages = document.getElementById('messages');
-            messages.scrollTop = messages.scrollHeight;
+            const messageDiv = document.getElementById('messages');
+            const newMessage = document.createElement('p');
+            newMessage.textContent = msg;
+            messageDiv.appendChild(newMessage);
         });
     </script>
 </body>
 </html>
+
